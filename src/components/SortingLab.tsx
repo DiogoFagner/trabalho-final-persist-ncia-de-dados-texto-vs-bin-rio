@@ -277,6 +277,14 @@ export function SortingLab() {
               >
                 <SearchIcon className="h-3.5 w-3.5" /> Busca
               </button>
+              <button
+                onClick={() => setMode("persist")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  mode === "persist" ? "bg-amber-500 text-black" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <HardDrive className="h-3.5 w-3.5" /> Persistência
+              </button>
             </div>
             <div className="flex items-center gap-2 text-xs">
               <Legend />
