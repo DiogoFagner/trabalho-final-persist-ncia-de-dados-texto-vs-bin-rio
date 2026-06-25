@@ -343,9 +343,17 @@ export function SortingLab() {
                 </Select>
               </div>
             )}
-            <div className={`flex items-end ${mode === "compare" ? "md:col-span-2" : ""}`}>
-              <Button onClick={load} disabled={loading} className="w-full">
-                {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Recarregar dados"}
+            <div className={`flex items-end gap-2 ${mode === "compare" ? "md:col-span-2" : ""}`}>
+              <Button onClick={load} disabled={loading} className="flex-1">
+                {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Recarregar (API)"}
+              </Button>
+              <Button
+                onClick={() => loadOffline()}
+                disabled={loading}
+                className="flex-1 bg-amber-500 hover:bg-amber-600 text-black font-semibold"
+                title="Lê dados do arquivo salvo localmente via backend Python"
+              >
+                <HardDrive className="h-4 w-4 mr-1" /> Modo Offline
               </Button>
             </div>
           </div>
