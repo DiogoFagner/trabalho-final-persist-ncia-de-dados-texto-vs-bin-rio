@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Play, Pause, SkipForward, RotateCcw, Loader2, BarChart3, Swords, LayoutGrid, Search as SearchIcon } from "lucide-react";
+import { Play, Pause, SkipForward, RotateCcw, Loader2, BarChart3, Swords, LayoutGrid, Search as SearchIcon, HardDrive } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,8 +14,10 @@ import type { AlgoKey, SortStep } from "@/lib/sorting/types";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend as ReLegend, CartesianGrid } from "recharts";
 import { CompareMode } from "./CompareMode";
 import { SearchLab } from "./SearchLab";
+import { PersistenceLab } from "./PersistenceLab";
+import { persistApi } from "@/lib/persistence";
 
-type Mode = "single" | "compare" | "search";
+type Mode = "single" | "compare" | "search" | "persist";
 
 const ALGO_KEYS: AlgoKey[] = ["bubble", "selection", "insertion", "merge", "quick", "heap"];
 
@@ -149,6 +151,22 @@ export function SortingLab() {
     }
   }, [source, field, sample]);
 
+  const loadOffline = useCallback(async (preloaded?: DataItem[]) => {
+    setLoading(true);
+    try {
+      const data = preloaded ?? (await persistApi.offline());
+      setItems(data);
+      setSteps([]);
+      setIdx(0);
+      setElapsed(0);
+      if (!preloaded) toast.success(`Modo Offline: ${data.length} itens lidos do disco.`);
+    } catch (e) {
+      toast.error("Falha no modo offline: " + (e as Error).message + " — confira se o backend Python está rodando.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => { load(); }, [load]);
 
   const buildSteps = useCallback(() => {
@@ -259,6 +277,14 @@ export function SortingLab() {
               >
                 <SearchIcon className="h-3.5 w-3.5" /> Busca
               </button>
+              <button
+                onClick={() => setMode("persist")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                  mode === "persist" ? "bg-amber-500 text-black" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <HardDrive className="h-3.5 w-3.5" /> Persistência
+              </button>
             </div>
             <div className="flex items-center gap-2 text-xs">
               <Legend />
@@ -317,9 +343,17 @@ export function SortingLab() {
                 </Select>
               </div>
             )}
-            <div className={`flex items-end ${mode === "compare" ? "md:col-span-2" : ""}`}>
-              <Button onClick={load} disabled={loading} className="w-full">
-                {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Recarregar dados"}
+            <div className={`flex items-end gap-2 ${mode === "compare" ? "md:col-span-2" : ""}`}>
+              <Button onClick={load} disabled={loading} className="flex-1">
+                {loading ? <Loader2 className="animate-spin h-4 w-4" /> : "Recarregar (API)"}
+              </Button>
+              <Button
+                onClick={() => loadOffline()}
+                disabled={loading}
+                className="flex-1 bg-amber-500 hover:bg-amber-600 text-black font-semibold"
+                title="Lê dados do arquivo salvo localmente via backend Python"
+              >
+                <HardDrive className="h-4 w-4 mr-1" /> Modo Offline
               </Button>
             </div>
           </div>
@@ -435,8 +469,12 @@ export function SortingLab() {
           </Card>
         )}
 
+        {mode === "persist" && (
+          <PersistenceLab items={items} onLoadOffline={(d) => loadOffline(d)} />
+        )}
+
         {/* Comparison */}
-        {mode !== "search" && <Card className="p-5 space-y-4">
+        {mode !== "search" && mode !== "persist" && <Card className="p-5 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <h2 className="text-lg font-semibold flex items-center gap-2"><BarChart3 className="h-5 w-5" /> Relatório comparativo</h2>
