@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Play, Pause, SkipForward, RotateCcw, Loader2, BarChart3, Swords, LayoutGrid, Search as SearchIcon } from "lucide-react";
+import { Play, Pause, SkipForward, RotateCcw, Loader2, BarChart3, Swords, LayoutGrid, Search as SearchIcon, HardDrive } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,8 +14,10 @@ import type { AlgoKey, SortStep } from "@/lib/sorting/types";
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend as ReLegend, CartesianGrid } from "recharts";
 import { CompareMode } from "./CompareMode";
 import { SearchLab } from "./SearchLab";
+import { PersistenceLab } from "./PersistenceLab";
+import { persistApi } from "@/lib/persistence";
 
-type Mode = "single" | "compare" | "search";
+type Mode = "single" | "compare" | "search" | "persist";
 
 const ALGO_KEYS: AlgoKey[] = ["bubble", "selection", "insertion", "merge", "quick", "heap"];
 
