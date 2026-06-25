@@ -151,6 +151,22 @@ export function SortingLab() {
     }
   }, [source, field, sample]);
 
+  const loadOffline = useCallback(async (preloaded?: DataItem[]) => {
+    setLoading(true);
+    try {
+      const data = preloaded ?? (await persistApi.offline());
+      setItems(data);
+      setSteps([]);
+      setIdx(0);
+      setElapsed(0);
+      if (!preloaded) toast.success(`Modo Offline: ${data.length} itens lidos do disco.`);
+    } catch (e) {
+      toast.error("Falha no modo offline: " + (e as Error).message + " — confira se o backend Python está rodando.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => { load(); }, [load]);
 
   const buildSteps = useCallback(() => {
