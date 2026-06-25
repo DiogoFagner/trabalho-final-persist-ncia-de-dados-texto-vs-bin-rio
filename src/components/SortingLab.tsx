@@ -469,8 +469,12 @@ export function SortingLab() {
           </Card>
         )}
 
+        {mode === "persist" && (
+          <PersistenceLab items={items} onLoadOffline={(d) => loadOffline(d)} />
+        )}
+
         {/* Comparison */}
-        {mode !== "search" && <Card className="p-5 space-y-4">
+        {mode !== "search" && mode !== "persist" && <Card className="p-5 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <h2 className="text-lg font-semibold flex items-center gap-2"><BarChart3 className="h-5 w-5" /> Relatório comparativo</h2>
